@@ -1,25 +1,58 @@
-import logo from './logo.svg';
-import './App.css';
+import { Container, Row, Col } from "reactstrap";
+import React, { Component } from 'react'
+import CategoryList from "./CategoryList";
+import Navi from "./Navi";
+import ProductList from "./ProductList";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+export default class App extends Component {
 
-export default App;
+  state = { currentCategory: "", products: [] }
+
+  componentDidMount() {
+    this.getProducts();
+  }
+
+  getProducts = (categoryId) => {
+
+    let url = "http://localhost:3000/products";
+    if (categoryId) {
+      url += "?categoryId=" + categoryId;
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(data => this.setState({ products: data }));;
+  }
+
+  changeCategory = (category) => {
+    this.setState({ currentCategory: category.categoryName })
+    this.getProducts(category.id);
+  }
+  render() {
+    let productInfo = { title: "Product List", baskabisey: "baska" }
+    let categoryInfo = { title: "Category List" }
+    return (
+      <div>
+        <Container>
+
+          <Row>
+            <Navi />
+          </Row>
+
+          <Row>
+            <Col xs='3'>
+              <CategoryList currentCategory={this.state.currentCategory} changeCategory={this.changeCategory} info={categoryInfo} />
+            </Col>
+
+            <Col xs='9'>
+              <ProductList products={this.state.products} currentCategory={this.state.currentCategory} info={productInfo} />
+            </Col>
+          </Row>
+
+        </Container>
+
+
+      </div>
+    );
+
+  }
+};

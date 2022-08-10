@@ -4,6 +4,11 @@ import CategoryList from "./CategoryList";
 import Navi from "./Navi";
 import ProductList from "./ProductList";
 import alertify from "alertifyjs";
+import { Route, Switch } from 'react-router-dom'
+import NotFound from "./NotFound";
+import CartList from "./CartList";
+
+
 
 export default class App extends Component {
 
@@ -39,11 +44,14 @@ export default class App extends Component {
       newCart.push({ product: product, quantity: 1 });
     }
     this.setState({ cart: newCart });
+    alertify.success(product.productName + "added to cart!", 2)
   }
 
   removeFromCart = (product) => {
-    let newCart = this.state.cart.filter(c=>c.product.id!==product.id)
-    this.setState({cart:newCart})
+    let newCart = this.state.cart.filter(c => c.product.id !== product.id)
+    this.setState({ cart: newCart });
+    alertify.error(product.productName + "remove from cart!", 2)
+
   }
   render() {
     let productInfo = { title: "Product List", baskabisey: "baska" }
@@ -58,7 +66,25 @@ export default class App extends Component {
             </Col>
 
             <Col xs='9'>
-              <ProductList products={this.state.products} addToCart={this.addToCart} currentCategory={this.state.currentCategory} info={productInfo} />
+
+              <Switch>
+                <Route exact path="/" render={props => (
+                  <ProductList {...props} 
+                  products={this.state.products} 
+                  addToCart={this.addToCart} 
+                  currentCategory={this.state.currentCategory} 
+                  info={productInfo} />
+                )
+
+                } />
+                <Route exact path="/cart" render={props => (
+                  <CartList {...props}
+                  cart={this.state.cart}
+                  removeFromCart={this.removeFromCart}  />
+                )} />
+                <Route component={NotFound} />
+
+              </Switch>
             </Col>
           </Row>
 
